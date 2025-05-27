@@ -44,7 +44,7 @@ def load_data(path):
 ###### 選擇金融商品
 st.subheader("選擇金融商品: ")
 # choices = ['台積電: 2022.1.1 至 2024.4.9', '大台指2024.12到期: 2024.1 至 2024.4.9']
-choices = ['富邦金期貨: 2023.4.15 至 2025.4.16', '華碩: 2023.4.17-2025.4.16', '聯電期貨: 2023.4.17-2025.4.16']
+choices = ['富邦金期貨: 2023.4.15 至 2025.4.16', '華碩: 2023.4.17至2025.4.16', '聯電期貨: 2023.4.17至2025.4.16']
 choice = st.selectbox('選擇金融商品', choices, index=0)
 ##### 读取Pickle文件
 if choice == choices[0] :         ##'台積電: 2022.1.1 至 2024.4.9':
@@ -81,8 +81,8 @@ if choice == choices[2] :                                               ##'小�
 
 
 ## 轉變為datetime object.
-start_date = datetime.datetime.strptime(start_date,'%Y-%m-%d')
-end_date = datetime.datetime.strptime(end_date,'%Y-%m-%d')
+start_date = datetime.datetime.strptime(start_date,'%Y.%m.%d')
+end_date = datetime.datetime.strptime(end_date,'%Y.%m.%d')
 ## 使用条件筛选选择时间区间的数据
 df = df_original[(df_original['time'] >= start_date) & (df_original['time'] <= end_date)]
 
