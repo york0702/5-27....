@@ -675,8 +675,10 @@ if choice_strategy == choices_strategies[1]:
         ShortRSIPeriod = st.slider('短RSI週期', 1, 20, 6, key='rsi_short')
         Order_Quantity = st.slider('下單數量', 1, 10, 1, key='rsi_qty')
 
+    # 計算 RSI 指標
     KBar_df['RSI_long'] = Calculate_RSI(KBar_df, LongRSIPeriod)
     KBar_df['RSI_short'] = Calculate_RSI(KBar_df, ShortRSIPeriod)
+
     OrderRecord = Record()
 
     for n in range(1, len(KBar_df['time']) - 1):
@@ -684,32 +686,47 @@ if choice_strategy == choices_strategies[1]:
             continue
 
         if OrderRecord.GetOpenInterest() == 0:
+            # 黃金交叉 - 多單進場
             if KBar_df['RSI_short'][n-1] <= KBar_df['RSI_long'][n-1] and KBar_df['RSI_short'][n] > KBar_df['RSI_long'][n]:
-                OrderRecord.Order('Buy', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1], Order_Quantity)
+                OrderRecord.Order('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
                 StopLossPoint = KBar_df['open'][n+1] - MoveStopLoss
                 continue
+            # 死亡交叉 - 空單進場
             if KBar_df['RSI_short'][n-1] >= KBar_df['RSI_long'][n-1] and KBar_df['RSI_short'][n] < KBar_df['RSI_long'][n]:
-                OrderRecord.Order('Sell', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1], Order_Quantity)
+                OrderRecord.Order('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
                 StopLossPoint = KBar_df['open'][n+1] + MoveStopLoss
                 continue
 
         elif OrderRecord.GetOpenInterest() > 0:
-            if KBar_df['RSI_short'][n-1] >= KBar_df['RSI_long'][n-1] and KBar_df['RSI_short'][n] < KBar_df['RSI_long'][n]:
-                OrderRecord.Cover('Sell', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1], Order_Quantity)
-                continue
+            # 多單停損出場
             if KBar_df['close'][n] < StopLossPoint:
-                OrderRecord.Cover('Sell', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1], Order_Quantity)
+                OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                continue
+            # 多單死亡交叉反向出場
+            if KBar_df['RSI_short'][n-1] >= KBar_df['RSI_long'][n-1] and KBar_df['RSI_short'][n] < KBar_df['RSI_long'][n]:
+                OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
                 continue
 
         elif OrderRecord.GetOpenInterest() < 0:
-            if KBar_df['RSI_short'][n-1] <= KBar_df['RSI_long'][n-1] and KBar_df['RSI_short'][n] > KBar_df['RSI_long'][n]:
-                OrderRecord.Cover('Buy', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
-                continue
+            # 空單停損出場
             if KBar_df['close'][n] > StopLossPoint:
-                OrderRecord.Cover('Buy', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
+                OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -Order_Quantity)
+                continue
+            # 空單黃金交叉反向出場
+            if KBar_df['RSI_short'][n-1] <= KBar_df['RSI_long'][n-1] and KBar_df['RSI_short'][n] > KBar_df['RSI_long'][n]:
+                OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -Order_Quantity)
                 continue
 
+    # 繪圖
     ChartOrder_Trade(KBar_df, OrderRecord.GetTradeRecord())
+
+    # ======= 績效儀表板 =======
+    # 根據使用者選擇的策略來處理資料
+
+   # 顯示回測圖
+
+
+# 顯示績效儀表板
 
 
 # MACD 策略
@@ -996,16 +1013,98 @@ if choice == choices[2] :   #'小台指期貨2024.12到期: 2023.12 至 2024.4.1
 # OrderRecord.GetCumulativeProfit_rate()    ## 累計投資報酬率
 
 ##### 将投資績效存储成一个DataFrame並以表格形式呈現各項績效數據
-if len(OrderRecord.Profit)>0:
-    data = {
-        "項目": ["交易總盈虧(元)", "平均每次盈虧(元)", "平均投資報酬率", "平均獲利(只看獲利的)(元)", "平均虧損(只看虧損的)(元)", "勝率", "最大連續虧損(元)", "最大盈虧回落(MDD)(元)", "報酬風險比(交易總盈虧/最大盈虧回落(MDD))"],
-        "數值": [交易總盈虧, 平均每次盈虧, 平均投資報酬率, 平均獲利_只看獲利的, 平均虧損_只看虧損的, 勝率, 最大連續虧損, 最大盈虧回落_MDD, 報酬風險比]
-    }
-    df = pd.DataFrame(data)
-    if len(df)>0:
-        st.write(df)
+# 在程式交易部分之後，添加以下績效顯示程式碼
+
+# 績效儀表板
+if len(OrderRecord.Profit) > 0:
+    st.subheader("績效分析")
+    
+    # 計算績效指標
+    total_return = (1 + pd.Series(OrderRecord.Profit_rate)).prod() - 1
+    annual_return = np.mean(OrderRecord.Profit_rate) * 252
+    volatility = np.std(OrderRecord.Profit_rate) * np.sqrt(252)
+    sharpe_ratio = annual_return / volatility if volatility != 0 else 0
+    
+    # 計算最大回撤
+    cumulative_returns = (1 + pd.Series(OrderRecord.Profit_rate)).cumprod()
+    peak = cumulative_returns.cummax()
+    drawdown = (cumulative_returns - peak) / peak
+    max_drawdown = drawdown.min()
+    
+    # 計算勝率
+    win_rate = len([x for x in OrderRecord.Profit if x > 0]) / len(OrderRecord.Profit) if len(OrderRecord.Profit) > 0 else 0
+    
+    # 顯示績效指標
+    col1, col2, col3 = st.columns(3)
+    col1.metric("總報酬率", f"{total_return:.2%}")
+    col2.metric("年化報酬率", f"{annual_return:.2%}")
+    col3.metric("夏普比率", f"{sharpe_ratio:.2f}")
+    
+    col1, col2, col3 = st.columns(3)
+    col1.metric("最大回撤", f"{max_drawdown:.2%}")
+    col2.metric("波動率", f"{volatility:.2%}")
+    col3.metric("勝率", f"{win_rate:.2%}")
+    
+    # 繪製累計報酬曲線
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=KBar_df['time'][:len(cumulative_returns)],
+        y=cumulative_returns,
+        mode='lines',
+        name='策略累計報酬'
+    ))
+    
+    # 添加買賣點標記
+    trade_dates = [trade[2] for trade in OrderRecord.GetTradeRecord()]
+    trade_prices = [trade[3] for trade in OrderRecord.GetTradeRecord()]
+    trade_types = [trade[0] for trade in OrderRecord.GetTradeRecord()]
+    
+    buy_dates = [date for date, typ in zip(trade_dates, trade_types) if typ == 'Buy']
+    sell_dates = [date for date, typ in zip(trade_dates, trade_types) if typ == 'Sell']
+    
+    if buy_dates:
+        fig.add_trace(go.Scatter(
+            x=buy_dates,
+            y=[cumulative_returns[KBar_df['time'] == date].values[0] for date in buy_dates],
+            mode='markers',
+            marker=dict(color='green', size=10, symbol='triangle-up'),
+            name='買入點'
+        ))
+    
+    if sell_dates:
+        fig.add_trace(go.Scatter(
+            x=sell_dates,
+            y=[cumulative_returns[KBar_df['time'] == date].values[0] for date in sell_dates],
+            mode='markers',
+            marker=dict(color='red', size=10, symbol='triangle-down'),
+            name='賣出點'
+        ))
+    
+    fig.update_layout(
+        title='策略累計報酬曲線',
+        xaxis_title='日期',
+        yaxis_title='累計報酬率',
+        height=500
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # 顯示交易明細
+    st.subheader("交易明細")
+    trades = []
+    for trade in OrderRecord.GetTradeRecord():
+        trades.append({
+            "類型": trade[0],
+            "商品": trade[1],
+            "時間": trade[2],
+            "價格": trade[3],
+            "數量": trade[4],
+            "盈虧": trade[5] if len(trade) > 5 else None
+        })
+    
+    st.dataframe(pd.DataFrame(trades))
 else:
-    st.write('沒有交易記錄(已經了結之交易) !')
+    st.warning("沒有交易記錄可供分析")
 
 
 
