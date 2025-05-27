@@ -539,7 +539,7 @@ def ChartOrder_MA(Kbar_df,TR):
 
 #%%
 ###### 選擇不同交易策略:
-choices_strategies = ['<進場>: 移動平均線黃金交叉作多,死亡交叉作空. <出場>: 結算平倉(期貨), 移動停損.']
+choices_strategies = ['<進場>: 移動平均線黃金交叉作多,死亡交叉作空. <出場>: 結算平倉(期貨), 移動停損. ','RSI 策略','MACD 策略','布林通道策略']
 choice_strategy = st.selectbox('選擇交易策略', choices_strategies, index=0)
 
 
@@ -666,6 +666,7 @@ if choice_strategy == choices_strategies[0]:
 # 在 (6) 程式交易區塊後加入以下策略邏輯
 # 在 (6) 程式交易區塊後加入以下策略邏輯
 
+
 # RSI 策略
 if choice_strategy == choices_strategies[1]:
     with st.expander("<策略參數設定>: RSI策略"):
@@ -712,7 +713,7 @@ if choice_strategy == choices_strategies[1]:
 
 
 # MACD 策略
-if choice_strategy == choices_strategies[3]:
+if choice_strategy == choices_strategies[2]:
     with st.expander("<策略參數設定>: MACD策略"):
         MoveStopLoss = st.slider('停損量', 0, 100, 30, key='macd_stop')
         fast_period = st.slider('快速線週期', 1, 50, 12, key='macd_fast')
@@ -751,7 +752,7 @@ if choice_strategy == choices_strategies[3]:
 
 
 # 布林通道策略
-if choice_strategy == choices_strategies[2]:
+if choice_strategy == choices_strategies[3]:
     with st.expander("<策略參數設定>: 布林通道策略"):
         MoveStopLoss = st.slider('停損量', 0, 100, 30, key='bb_stop')
         period = st.slider('布林週期', 5, 60, 20, key='bb_period')
@@ -892,7 +893,7 @@ def 計算績效_股票():
         報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
     else:
         報酬風險比='資料不足無法計算'
-    return 交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比
+    return (交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比)
 
 
 def 計算績效_大台指期貨():
@@ -930,11 +931,10 @@ def 計算績效_小台指期貨():
 
 
 
+if choice == choices[0]:
+   交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比 = 計算績效_大台指期貨()
 
-
-if choice == choices[0] :   ##'台積電: 2022.1.1 至 2024.4.9':
-    交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比 = 計算績效_股票()
-    # 交易總盈虧 = OrderRecord.GetTotalProfit()*1000          ## 取得交易總盈虧
+# 交易總盈虧 = OrderRecord.GetTotalProfit()*1000          ## 取得交易總盈虧
     # 平均每次盈虧 = OrderRecord.GetAverageProfit()*1000         ## 取得交易 "平均" 盈虧(每次)
     # 平均投資報酬率 = OrderRecord.GetAverageProfitRate()    ## 取得交易 "平均" 投資報酬率(每次)  
     # 平均獲利_只看獲利的 = OrderRecord.GetAverEarn()*1000              ## 平均獲利(只看獲利的) 
@@ -977,9 +977,6 @@ if choice == choices[2] :   #'小台指期貨2024.12到期: 2023.12 至 2024.4.1
     #     報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
     # else:
     #     報酬風險比='資料不足無法計算'
-
-if choice == choices[3] :   #'英業達2020.1.2 至 2024.4.12':
-    交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比 = 計算績效_股票()
     # 交易總盈虧 = OrderRecord.GetTotalProfit()*1000          ## 取得交易總盈虧
     # 平均每次盈虧 = OrderRecord.GetAverageProfit()*1000         ## 取得交易 "平均" 盈虧(每次)
     # 平均投資報酬率 = OrderRecord.GetAverageProfitRate()    ## 取得交易 "平均" 投資報酬率(每次)  
@@ -992,9 +989,6 @@ if choice == choices[3] :   #'英業達2020.1.2 至 2024.4.12':
     #     報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
     # else:
     #     報酬風險比='資料不足無法計算'
-
-if choice == choices[4] :   #'堤維西2020.1.2 至 2024.4.12':
-    交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比 = 計算績效_股票()
 
 
 
@@ -1044,15 +1038,15 @@ else:
 
 
 ##### 畫累計盈虧圖:
-if choice == '台積電: 2022.1.1 至 2024.4.9':
+if choice == '富邦金期貨: 2023.4.15 至 2025.4.16':
     OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
 if choice == '大台指期貨2024.12到期: 2023.12 至 2024.4.11':
     OrderRecord.GeneratorProfitChart(choice='future1',StrategyName='MA')
 if choice == '小台指期貨2024.12到期: 2023.12 至 2024.4.11':
     OrderRecord.GeneratorProfitChart(choice='future2',StrategyName='MA')
-if choice == '英業達2020.1.2 至 2024.4.12':
+if choice == '華碩: 2023.4.17至2025.4.16':
     OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
-if choice == '堤維西2020.1.2 至 2024.4.12':
+if choice == '聯電期貨: 2023.4.17至2025.4.16':
     OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
 
     
