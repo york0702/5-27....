@@ -142,7 +142,8 @@ def Change_Cycle(Date,cycle_duration,KBar_dic,product_name):
         qty =  KBar_dic['volume'][i]
         amount = KBar_dic['amount'][i]
         #tag=KBar.TimeAdd(time,price,qty,prod)
-        tag=KBar.AddPrice(time, open_price, close_price, low_price, high_price, qty)
+        
+    tag=KBar.AddPrice(time, open_price, close_price, low_price, high_price, qty)
     
     ###### 形成 KBar 字典 (新週期的):
     KBar_dic = {}
