@@ -740,11 +740,6 @@ def calculate_performance(data):
 st.title("金融商品技術指標策略回測")
 
 ###### 選擇金融商品
-st.subheader("選擇金融商品: ")
-choices = ['富邦金期貨: 2023.4.15 至 2025.4.16', '華碩: 2023.4.17至2025.4.16', '聯電期貨: 2023.4.17至2025.4.16']
-choice = st.selectbox('選擇金融商品', choices, index=0, key='selectbox_product')
-start_date = st.text_input('開始日期(格式: 2023.4.15)', '2023.4.15', key='input_start_date')
-end_date = st.text_input('結束日期(格式: 2025.4.16)', '2025.4.16', key='input_end_date')
 
 
 if choice == choices[0]:
