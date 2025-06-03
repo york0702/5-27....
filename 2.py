@@ -994,15 +994,11 @@ else:
 
 ##### 畫累計盈虧圖:
 if choice == '富邦金期貨: 2023.4.15 至 2025.4.16':
-    OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
-if choice == '大台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    OrderRecord.GeneratorProfitChart(choice='future1',StrategyName='MA')
-if choice == '小台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    OrderRecord.GeneratorProfitChart(choice='future2',StrategyName='MA')
-if choice == '華碩: 2023.4.17至2025.4.16':
-    OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
-if choice == '聯電期貨: 2023.4.17至2025.4.16':
-    OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
+    OrderRecord.GeneratorProfitChart(choice='stock', StrategyName='MA')
+elif choice == '華碩: 2023.4.17至2025.4.16':
+    OrderRecord.GeneratorProfitChart(choice='stock', StrategyName='MA')
+elif choice == '聯電期貨: 2023.4.17至2025.4.16':
+    OrderRecord.GeneratorProfitChart(choice='stock', StrategyName='MA')
 
     
 
