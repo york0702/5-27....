@@ -1,19 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jun  3 14:52:54 2025
-
-@author: student
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jun  3 14:24:20 2025
-
-@author: student
-"""
-
-# -*- coding: utf-8 -*-
-"""
 金融資料視覺化看板
 """
 # 載入必要模組
